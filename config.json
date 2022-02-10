@@ -1,0 +1,8 @@
+{
+  "credsStore": "env",
+  "credHelpers": {
+    "registry.gitlab.com": "env",
+    "public.ecr.aws": "ecr-login",
+    "registry.cookielab.io": "env"
+  }
+}
