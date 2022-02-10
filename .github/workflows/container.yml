@@ -4,13 +4,6 @@ on:
     tags:        
       - '**'
 
-env:
-  KANIKO_VERSION: '1.7.0'
-  ENV_CRED_HELPER_VERSION: '1.1.0'
-  ECR_CRED_HELRER_VERSION: '0.6.0'
-  GCR_CRED_HELRER_VERSION: '2.1.0'
-  MANIFEST_TOOL_VERSION: '2.0.0-rc.1'
-
 jobs:
   build:
     name: Build container image and push it to registry
