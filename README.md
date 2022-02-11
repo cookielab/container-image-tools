@@ -1,9 +1,11 @@
 # cookielab/container-image-tools
 
 This container image contains tools for building and managing container images.
+Container is based on scratch but contains minimal shell tools from busybox.
 
 ## Tools
 
+- [Busybox](https://hub.docker.com/_/busybox?tab=description)
 - [Kaniko](https://github.com/googleContainerTools/kaniko/)
 - [Manifest Tool](https://github.com/estesp/manifest-tool)
 - [Skopeo](https://github.com/containers/skopeo)
