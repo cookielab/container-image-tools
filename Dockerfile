@@ -31,19 +31,19 @@ RUN curl -L https://github.com/GoogleCloudPlatform/docker-credential-gcr/release
 RUN tar -xf /workdir/docker-credential-gcr.tar.gz
 RUN chmod +x /workdir/docker-credential-gcr
 
-FROM golang:1.17 AS manifest_tool
+FROM alpine:3.15 as manifest_tool
 
-WORKDIR /go/src/app
+RUN apk --update --no-cache add curl
+
+WORKDIR /workdir
 
 ARG TARGETARCH
 ARG MANIFEST_TOOL_VERSION
 
-ENV GOARCH=$TARGETARCH
-ENV CGO_ENABLED=0
-ENV GOBIN=/usr/local/bin
-ENV GOOS=linux
-
-RUN go get github.com/estesp/manifest-tool/v2/cmd/manifest-tool@v$MANIFEST_TOOL_VERSION
+RUN curl -L https://github.com/estesp/manifest-tool/releases/download/v${MANIFEST_TOOL_VERSION}/binaries-manifest-tool-${MANIFEST_TOOL_VERSION}.tar.gz -o /workdir/binaries-manifest-tool.tar.gz
+RUN tar -xf /workdir/binaries-manifest-tool.tar.gz
+RUN cp /workdir/manifest-tool-linux-$TARGETARCH /workdir/manifest-tool
+RUN chmod +x /workdir/manifest-tool
 
 FROM golang:1.17 AS skopeo
 
@@ -78,7 +78,7 @@ COPY --from=kaniko /workdir-kaniko/unpacked/rootfs/kaniko/executor /cit/bin/kani
 COPY --from=credential_helpers /workdir/docker-credential-env /cit/bin/docker-credential-env
 COPY --from=credential_helpers /workdir/docker-credential-ecr-login /cit/bin/docker-credential-ecr-login
 COPY --from=credential_helpers /workdir/docker-credential-gcr /cit/bin/docker-credential-gcr
-COPY --from=manifest_tool /usr/local/bin/manifest-tool /cit/bin/manifest-tool
+COPY --from=manifest_tool /workdir/manifest-tool /cit/bin/manifest-tool
 COPY --from=skopeo /go/github.com/containers/skopeo/bin/skopeo /cit/bin/skopeo
 
 RUN apk --update --no-cache add ca-certificates
