@@ -1,0 +1,16 @@
+.multiarch:
+  parallel:
+    matrix:
+      - TARGETARCH: [amd64, arm64]
+  tags:
+    - ${TARGETARCH}
+
+# this job assumes you used previous temlate with `<registry-image>:<tag>-$TARGETARCH`
+
+.manifest:
+  script:
+    - >
+      manifest-tool push from-args \
+      --platforms linux/amd64,linux/arm64 \
+      --template "${REGISTRY_IMAGE}-ARCH" \
+      --target "${REGISTRY_IMAGE}"
