@@ -46,7 +46,7 @@ jobs:
           context: .
           file: ./Dockerfile
           build-args: |
-            KANIKO_VERSION=1.9.1
+            KANIKO_VERSION=1.9.2
             ENV_CRED_HELPER_VERSION=1.2.1
             ECR_CRED_HELRER_VERSION=0.6.0
             GCR_CRED_HELRER_VERSION=2.1.6
