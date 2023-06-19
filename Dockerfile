@@ -87,7 +87,7 @@ RUN cp /usr/share/ca-certificates/mozilla/* /cit/ssl/certs/
 
 FROM scratch
 
-COPY --from=busybox:1.34.1-musl /bin /busybox
+COPY --from=busybox:1.36.1-musl /bin /busybox
 # Declare /busybox as a volume to get it automatically in the path to ignore
 VOLUME /busybox
 
