@@ -1,0 +1,4 @@
+ARG VERSION
+FROM cookielab/container-image-tools:${VERSION}
+
+COPY config.aws.json /container-image-tools/.docker/config.json

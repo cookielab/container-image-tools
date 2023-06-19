@@ -58,3 +58,17 @@ jobs:
             cookielab/container-image-tools:${{ github.ref_name }}
             public.ecr.aws/cookielab/container-image-tools:${{ github.ref_name }}
             ghcr.io/${{ github.repository_owner }}/container-image-tools:${{ github.ref_name }}
+
+      - name: Build and push - AWS
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./Dockerfile.aws
+          build-args: |
+            VERSION=${{ github.ref_name }}
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            cookielab/container-image-tools:${{ github.ref_name }}-aws
+            public.ecr.aws/cookielab/container-image-tools:${{ github.ref_name }}-aws
+            ghcr.io/${{ github.repository_owner }}/container-image-tools:${{ github.ref_name }}-aws
