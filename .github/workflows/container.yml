@@ -48,7 +48,7 @@ jobs:
           build-args: |
             KANIKO_VERSION=1.11.0
             ENV_CRED_HELPER_VERSION=1.2.2
-            ECR_CRED_HELRER_VERSION=0.6.0
+            ECR_CRED_HELRER_VERSION=0.7.1
             GCR_CRED_HELRER_VERSION=2.1.7
             MANIFEST_TOOL_VERSION=2.0.8
             SKOPEO_VERSION=1.9.3
