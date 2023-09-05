@@ -45,7 +45,7 @@ RUN tar -xf /workdir/binaries-manifest-tool.tar.gz
 RUN cp /workdir/manifest-tool-linux-$TARGETARCH /workdir/manifest-tool
 RUN chmod +x /workdir/manifest-tool
 
-FROM golang:1.17 AS skopeo
+FROM golang:1.21 AS skopeo
 
 ARG SKOPEO_VERSION
 ARG SKOPEO_DIR=/go/github.com/containers/skopeo
