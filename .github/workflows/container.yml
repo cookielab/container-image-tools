@@ -47,7 +47,7 @@ jobs:
           file: ./Dockerfile
           build-args: |
             KANIKO_VERSION=1.19.2
-            ENV_CRED_HELPER_VERSION=1.2.2
+            ENV_CRED_HELPER_VERSION=1.2.4
             ECR_CRED_HELRER_VERSION=0.7.1
             GCR_CRED_HELRER_VERSION=2.1.10
             MANIFEST_TOOL_VERSION=2.0.8
