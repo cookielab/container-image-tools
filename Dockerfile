@@ -1,4 +1,4 @@
-FROM alpine:3.18 as kaniko
+FROM alpine:3.19 as kaniko
 
 RUN apk --update --no-cache add skopeo umoci curl
 
