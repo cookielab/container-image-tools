@@ -50,7 +50,7 @@ jobs:
             ENV_CRED_HELPER_VERSION=1.2.4
             ECR_CRED_HELRER_VERSION=0.7.1
             GCR_CRED_HELRER_VERSION=2.1.21
-            MANIFEST_TOOL_VERSION=2.0.8
+            MANIFEST_TOOL_VERSION=2.1.5
             SKOPEO_VERSION=1.13.3
           platforms: linux/amd64,linux/arm64
           push: true
