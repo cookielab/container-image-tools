@@ -108,4 +108,4 @@ RUN ["/busybox/ln", "-s", "/busybox/sh", "/bin/sh"]
 
 WORKDIR /workdir
 
-ENTRYPOINT [ "/bin/sh" ]
+CMD ["/bin/sh"]
