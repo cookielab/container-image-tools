@@ -1,4 +1,4 @@
-FROM alpine:3.20 as kaniko
+FROM alpine:3.21 as kaniko
 
 RUN apk --update --no-cache add skopeo umoci curl
 
@@ -9,7 +9,7 @@ ARG KANIKO_VERSION
 RUN skopeo copy docker://gcr.io/kaniko-project/executor:v${KANIKO_VERSION} oci:kaniko:current
 RUN umoci unpack --image kaniko:current unpacked
 
-FROM alpine:3.20 as credential_helpers
+FROM alpine:3.21 as credential_helpers
 
 RUN apk --update --no-cache add unzip curl
 
@@ -31,7 +31,7 @@ RUN curl -L https://github.com/GoogleCloudPlatform/docker-credential-gcr/release
 RUN tar -xf /workdir/docker-credential-gcr.tar.gz
 RUN chmod +x /workdir/docker-credential-gcr
 
-FROM alpine:3.20 as manifest_tool
+FROM alpine:3.21 as manifest_tool
 
 RUN apk --update --no-cache add curl
 
@@ -67,7 +67,7 @@ ENV GOOS=linux
 
 RUN make BUILDTAGS=containers_image_openpgp GO_DYN_FLAGS=
 
-FROM alpine:3.20 AS intermediate
+FROM alpine:3.21 AS intermediate
 
 RUN mkdir -p /cit/.docker
 COPY config.json /cit/.docker/config.json
