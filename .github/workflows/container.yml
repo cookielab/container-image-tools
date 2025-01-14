@@ -49,8 +49,8 @@ jobs:
             KANIKO_VERSION=1.23.2
             ENV_CRED_HELPER_VERSION=1.3.0
             ECR_CRED_HELRER_VERSION=0.9.0
-            GCR_CRED_HELRER_VERSION=2.1.22
-            MANIFEST_TOOL_VERSION=2.1.26
+            GCR_CRED_HELRER_VERSION=2.1.26
+            MANIFEST_TOOL_VERSION=2.1.9
             SKOPEO_VERSION=1.15.1
           platforms: linux/amd64,linux/arm64
           push: true
