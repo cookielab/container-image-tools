@@ -51,7 +51,7 @@ jobs:
             ECR_CRED_HELRER_VERSION=0.9.1
             GCR_CRED_HELRER_VERSION=2.1.26
             MANIFEST_TOOL_VERSION=2.1.9
-            SKOPEO_VERSION=1.15.1
+            SKOPEO_VERSION=1.18.0
           platforms: linux/amd64,linux/arm64
           push: true
           tags: |
