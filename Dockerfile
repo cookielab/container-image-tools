@@ -5,6 +5,7 @@ RUN apk --update --no-cache add skopeo umoci curl
 WORKDIR /workdir-kaniko
 
 ARG KANIKO_VERSION
+ARG ASSUME_ROLE_VERSION
 
 RUN skopeo copy docker://gcr.io/kaniko-project/executor:v${KANIKO_VERSION} oci:kaniko:current
 RUN umoci unpack --image kaniko:current unpacked
@@ -80,6 +81,9 @@ COPY --from=credential_helpers /workdir/docker-credential-ecr-login /cit/bin/doc
 COPY --from=credential_helpers /workdir/docker-credential-gcr /cit/bin/docker-credential-gcr
 COPY --from=manifest_tool /workdir/manifest-tool /cit/bin/manifest-tool
 COPY --from=skopeo /go/github.com/containers/skopeo/bin/skopeo /cit/bin/skopeo
+
+FROM cookielab/deployer:${ASSUME_ROLE_VERSION} AS deployer
+COPY --from=deployer /usr/local/bin/assume-role /cit/bin/assume-role
 
 RUN apk --update --no-cache add ca-certificates
 RUN mkdir -p /cit/ssl/certs
