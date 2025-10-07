@@ -1,15 +1,5 @@
-FROM alpine:3.22 as kaniko
-
-RUN apk --update --no-cache add skopeo umoci curl
-
-WORKDIR /workdir-kaniko
-
-ARG KANIKO_VERSION
-
-RUN skopeo copy docker://gcr.io/kaniko-project/executor:v${KANIKO_VERSION} oci:kaniko:current
-RUN umoci unpack --image kaniko:current unpacked
-
-FROM alpine:3.22 as credential_helpers
+ARG BUILDAH_VERSION=latest
+FROM alpine:3.22 AS credential_helpers
 
 RUN apk --update --no-cache add unzip curl
 
@@ -31,7 +21,7 @@ RUN curl -L https://github.com/GoogleCloudPlatform/docker-credential-gcr/release
 RUN tar -xf /workdir/docker-credential-gcr.tar.gz
 RUN chmod +x /workdir/docker-credential-gcr
 
-FROM alpine:3.22 as manifest_tool
+FROM alpine:3.22 AS manifest_tool
 
 RUN apk --update --no-cache add curl
 
@@ -74,7 +64,6 @@ COPY config.json /cit/.docker/config.json
 RUN chmod 0644 /cit/.docker/config.json
 
 RUN mkdir -p /cit/bin
-COPY --from=kaniko /workdir-kaniko/unpacked/rootfs/kaniko/executor /cit/bin/kaniko
 COPY --from=credential_helpers /workdir/docker-credential-env /cit/bin/docker-credential-env
 COPY --from=credential_helpers /workdir/docker-credential-ecr-login /cit/bin/docker-credential-ecr-login
 COPY --from=credential_helpers /workdir/docker-credential-gcr /cit/bin/docker-credential-gcr
@@ -85,11 +74,11 @@ RUN apk --update --no-cache add ca-certificates
 RUN mkdir -p /cit/ssl/certs
 RUN cp /usr/share/ca-certificates/mozilla/* /cit/ssl/certs/
 
-FROM scratch
+FROM quay.io/buildah/stable:${BUILDAH_VERSION}
 
-COPY --from=busybox:1.37.0-musl /bin /busybox
-# Declare /busybox as a volume to get it automatically in the path to ignore
-VOLUME /busybox
+#COPY --from=busybox:1.37.0-musl /bin /busybox
+## Declare /busybox as a volume to get it automatically in the path to ignore
+#VOLUME /busybox
 
 COPY --from=intermediate /cit /container-image-tools
 # Declare /container-image-tools as a volume to get it automatically in the path to ignore
@@ -97,14 +86,14 @@ VOLUME /container-image-tools
 
 COPY --from=skopeo /go/github.com/containers/skopeo/default-policy.json /etc/containers/policy.json
 
-ENV PATH /busybox:/container-image-tools/bin
-ENV DOCKER_CONFIG /container-image-tools/.docker/
+ENV PATH=/usr/local/bin:/usr/bin:/container-image-tools/bin
+ENV DOCKER_CONFIG=/container-image-tools/.docker/
 ENV SSL_CERT_DIR=/container-image-tools/ssl/certs
-ENV HOME /root
-ENV USER root
+ENV HOME=/root
+ENV USER=root
 
-RUN ["/busybox/mkdir", "-p", "/bin"]
-RUN ["/busybox/ln", "-s", "/busybox/sh", "/bin/sh"]
+#RUN ["/busybox/mkdir", "-p", "/bin"]
+#RUN ["/busybox/ln", "-s", "/busybox/sh", "/bin/sh"]
 
 WORKDIR /workdir
 
