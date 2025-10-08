@@ -6,7 +6,7 @@ Container is based on scratch but contains minimal shell tools from busybox.
 ## Tools
 
 - [Busybox](https://hub.docker.com/_/busybox?tab=description)
-- [Kaniko](https://github.com/googleContainerTools/kaniko/)
+- [buildah](https://github.com/containers/buildah/)
 - [Manifest Tool](https://github.com/estesp/manifest-tool)
 - [Skopeo](https://github.com/containers/skopeo)
 - Credential Helpers
@@ -21,7 +21,7 @@ Build container image and push it to GitLab Registru.
 ```shell
 export DOCKER_registry_gitlab_com_USR="${CI_REGISTRY_USER}"
 export DOCKER_registry_gitlab_com_PSW="${CI_REGISTRY_PASSWORD}"
-kaniko --destination "${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA}"
+# TODO: buildah example
 ```
 
 As you can see we don't need to create any _docker config.json_ file. But wes use power of Creds Helpers.
@@ -42,6 +42,7 @@ variables:
 build:
   extends: .multiarch
   script:
+    # TODO: replace with buildah example
     - kaniko --build-arg TARGETARCH="${TARGETARCH}" --destination "${REGISTRY_IMAGE}-${TARGETARCH}"
 
 build-multiarch:
