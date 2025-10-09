@@ -76,6 +76,16 @@ RUN cp /usr/share/ca-certificates/mozilla/* /cit/ssl/certs/
 
 FROM quay.io/buildah/stable:${BUILDAH_VERSION}
 
+# Configure for rootless container execution
+RUN touch /etc/subgid /etc/subuid \
+ && chmod g=u /etc/subgid /etc/subuid /etc/passwd \
+ && echo build:10000:65536 > /etc/subuid \
+ && echo build:10000:65536 > /etc/subgid
+
+# Configure Buildah storage driver
+RUN mkdir -p /home/build/.config/containers \
+ && (echo '[storage]';echo 'driver = "vfs"') > /home/build/.config/containers/storage.conf
+
 #COPY --from=busybox:1.37.0-musl /bin /busybox
 ## Declare /busybox as a volume to get it automatically in the path to ignore
 #VOLUME /busybox
@@ -85,6 +95,11 @@ COPY --from=intermediate /cit /container-image-tools
 VOLUME /container-image-tools
 
 COPY --from=skopeo /go/github.com/containers/skopeo/default-policy.json /etc/containers/policy.json
+
+# Buildah configuration for rootless execution
+ENV BUILDAH_ISOLATION=chroot
+ENV BUILDAH_FORMAT=docker
+ENV STORAGE_DRIVER=vfs
 
 ENV PATH=/usr/local/bin:/usr/bin:/container-image-tools/bin
 ENV DOCKER_CONFIG=/container-image-tools/.docker/
