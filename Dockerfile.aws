@@ -1,4 +1,23 @@
 ARG VERSION
-FROM cookielab/container-image-tools:${VERSION}
+FROM cookielab/container-image-tools:${VERSION} AS tools
 
+# Final image with AWS CLI preinstalled (multi-arch manifest)
+FROM public.ecr.aws/aws-cli/aws-cli:2.31.14
+
+# Bring in your tools
+COPY --from=tools /container-image-tools /container-image-tools
+COPY --from=tools /etc/containers/policy.json /etc/containers/policy.json
+
+# Env
+ENV PATH $PATH:/usr/local/bin:/container-image-tools/bin
+ENV DOCKER_CONFIG /container-image-tools/.docker/
+ENV SSL_CERT_DIR /container-image-tools/ssl/certs
+ENV HOME /root
+ENV USER root
+
+WORKDIR /workdir
+
+# Optional: AWS-specific Docker config
 COPY config.aws.json /container-image-tools/.docker/config.json
+ENTRYPOINT []
+CMD ["/bin/sh"]
