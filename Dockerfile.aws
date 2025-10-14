@@ -1,25 +1,14 @@
 ARG VERSION
 FROM cookielab/container-image-tools:${VERSION} AS tools
 
-FROM alpine:3.22
-
-ARG TARGETARCH
-RUN apk add --no-cache curl unzip libc6-compat libstdc++ ca-certificates \
- && if [ "$TARGETARCH" = "arm64" ] || [ "$TARGETARCH" = "aarch64" ]; then \
-      URL="https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip"; \
-    else \
-      URL="https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip"; \
-    fi \
- && curl -sSLo /tmp/awscliv2.zip "$URL" \
- && unzip -q /tmp/awscliv2.zip -d /tmp \
- && /tmp/aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli \
- && rm -rf /tmp/aws /tmp/awscliv2.zip
+# Final image with AWS CLI preinstalled (multi-arch manifest)
+FROM public.ecr.aws/aws-cli/aws-cli:2.31.14
 
 # Bring in your tools
 COPY --from=tools /container-image-tools /container-image-tools
 COPY --from=tools /etc/containers/policy.json /etc/containers/policy.json
 
-# Keep the same envs but add /usr/local/bin to PATH for aws
+# Env
 ENV PATH /usr/local/bin:/container-image-tools/bin
 ENV DOCKER_CONFIG /container-image-tools/.docker/
 ENV SSL_CERT_DIR /container-image-tools/ssl/certs
@@ -28,5 +17,5 @@ ENV USER root
 
 WORKDIR /workdir
 
-# Optional: ensure docker config for AWS variant (if you need it)
+# Optional: AWS-specific Docker config
 COPY config.aws.json /container-image-tools/.docker/config.json
