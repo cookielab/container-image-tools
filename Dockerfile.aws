@@ -2,16 +2,15 @@ ARG VERSION
 FROM cookielab/container-image-tools:${VERSION}
 
 ARG TARGETARCH
-RUN apt-get update && apt-get install -y unzip curl && \
-    if [ "$TARGETARCH" = "arm64" ] || [ "$TARGETARCH" = "aarch64" ]; then \
+RUN apk add --no-cache curl unzip libc6-compat libstdc++ \
+ && if [ "$TARGETARCH" = "arm64" ] || [ "$TARGETARCH" = "aarch64" ]; then \
       URL="https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip"; \
     else \
       URL="https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip"; \
-    fi && \
-    curl -sSLo /tmp/awscliv2.zip "$URL" && \
-    unzip -q /tmp/awscliv2.zip -d /tmp && \
-    /tmp/aws/install && \
-    rm -rf /tmp/aws /tmp/awscliv2.zip && \
-    apt-get clean
+    fi \
+ && curl -sSLo /tmp/awscliv2.zip "$URL" \
+ && unzip -q /tmp/awscliv2.zip -d /tmp \
+ && /tmp/aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli \
+ && rm -rf /tmp/aws /tmp/awscliv2.zip
 
 COPY config.aws.json /container-image-tools/.docker/config.json
