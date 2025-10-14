@@ -9,7 +9,7 @@ COPY --from=tools /container-image-tools /container-image-tools
 COPY --from=tools /etc/containers/policy.json /etc/containers/policy.json
 
 # Env
-ENV PATH /usr/local/bin:/container-image-tools/bin
+ENV PATH $PATH:/usr/local/bin:/container-image-tools/bin
 ENV DOCKER_CONFIG /container-image-tools/.docker/
 ENV SSL_CERT_DIR /container-image-tools/ssl/certs
 ENV HOME /root
