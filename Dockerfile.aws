@@ -20,3 +20,4 @@ WORKDIR /workdir
 # Optional: AWS-specific Docker config
 COPY config.aws.json /container-image-tools/.docker/config.json
 ENTRYPOINT []
+CMD ["/bin/sh"]
