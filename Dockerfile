@@ -45,6 +45,19 @@ RUN tar -xf /workdir/binaries-manifest-tool.tar.gz
 RUN cp /workdir/manifest-tool-linux-$TARGETARCH /workdir/manifest-tool
 RUN chmod +x /workdir/manifest-tool
 
+FROM alpine:3.23 as buildkit
+
+RUN apk --update --no-cache add curl tar
+
+WORKDIR /workdir
+
+ARG TARGETARCH
+ARG BUILDKIT_VERSION
+
+RUN curl -L https://github.com/moby/buildkit/releases/download/v${BUILDKIT_VERSION}/buildkit-v${BUILDKIT_VERSION}.linux-${TARGETARCH}.tar.gz -o /workdir/buildkit.tar.gz
+RUN tar -xf /workdir/buildkit.tar.gz
+RUN chmod +x /workdir/bin/*
+
 FROM golang:1.24 AS skopeo
 
 ARG SKOPEO_VERSION
@@ -80,6 +93,8 @@ COPY --from=credential_helpers /workdir/docker-credential-ecr-login /cit/bin/doc
 COPY --from=credential_helpers /workdir/docker-credential-gcr /cit/bin/docker-credential-gcr
 COPY --from=manifest_tool /workdir/manifest-tool /cit/bin/manifest-tool
 COPY --from=skopeo /go/github.com/containers/skopeo/bin/skopeo /cit/bin/skopeo
+COPY --from=buildkit /workdir/bin/buildctl /cit/bin/buildctl
+COPY --from=buildkit /workdir/bin/buildkitd /cit/bin/buildkitd
 
 RUN apk --update --no-cache add ca-certificates
 RUN mkdir -p /cit/ssl/certs
