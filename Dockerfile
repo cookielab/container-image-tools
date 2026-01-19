@@ -1,3 +1,5 @@
+ARG BUILDKIT_VERSION
+
 FROM alpine:3.23 as kaniko
 
 RUN apk --update --no-cache add skopeo umoci curl
@@ -45,7 +47,6 @@ RUN tar -xf /workdir/binaries-manifest-tool.tar.gz
 RUN cp /workdir/manifest-tool-linux-$TARGETARCH /workdir/manifest-tool
 RUN chmod +x /workdir/manifest-tool
 
-ARG BUILDKIT_VERSION
 FROM moby/buildkit:v${BUILDKIT_VERSION}-rootless as buildkit
 
 FROM golang:1.24 AS skopeo
