@@ -173,6 +173,7 @@ ENV USER root
 
 RUN ["/busybox/mkdir", "-p", "/bin"]
 RUN ["/busybox/ln", "-s", "/busybox/sh", "/bin/sh"]
+RUN ["/busybox/ln", "-s", "/busybox/sed", "/bin/sed"]
 RUN ["/busybox/mkdir", "-p", "/etc/ssl"]
 RUN ["/busybox/ln", "-s", "/container-image-tools/ssl/certs", "/etc/ssl/certs"]
 
