@@ -84,6 +84,71 @@ COPY --from=skopeo /go/github.com/containers/skopeo/bin/skopeo /cit/bin/skopeo
 RUN apk --update --no-cache add ca-certificates
 RUN mkdir -p /cit/ssl/certs
 RUN cp /usr/share/ca-certificates/mozilla/* /cit/ssl/certs/
+RUN cp /etc/ssl/certs/ca-certificates.crt /cit/ssl/certs/
+
+FROM alpine:3.23 AS tools
+
+RUN apk add --no-cache \
+  wget \
+  build-base \
+  clang \
+  openssl-dev \
+  openssl-libs-static \
+  nghttp2-dev \
+  nghttp2-static \
+  libssh2-dev \
+  libssh2-static \
+  ca-certificates \
+  zlib-dev \
+  zlib-static \
+  perl
+
+WORKDIR /output
+WORKDIR /build
+
+RUN wget https://github.com/jqlang/jq/releases/download/jq-1.8.1/jq-1.8.1.tar.gz \
+  && tar xzf jq-1.8.1.tar.gz
+
+RUN wget https://curl.se/download/curl-8.18.0.tar.gz \
+  && tar xzf curl-8.18.0.tar.gz
+
+WORKDIR /build/curl-8.18.0
+
+ENV CC=clang
+
+RUN ./configure \
+  --disable-shared \
+  --enable-static \
+  --with-openssl \
+  --disable-ldap \
+  --disable-rtsp \
+  --disable-dict \
+  --disable-telnet \
+  --disable-tftp \
+  --disable-pop3 \
+  --disable-imap \
+  --disable-smtp \
+  --disable-gopher \
+  --disable-docs \
+  --disable-manual \
+  --without-brotli \
+  --without-libpsl \
+  --without-libidn2 \
+  --without-librtmp \
+  LDFLAGS="-static" PKG_CONFIG="pkg-config --static"
+
+RUN make -j$(nproc) V=1 LDFLAGS="-static -all-static"
+RUN strip src/curl && cp src/curl /output
+
+WORKDIR /build/jq-1.8.1
+
+RUN ./configure \
+  --disable-shared \
+  --enable-static \
+  LDFLAGS="-static"
+
+RUN make -j$(nproc) V=1 LDFLAGS="-static -all-static"
+RUN cp jq /output
 
 FROM scratch
 
@@ -91,13 +156,16 @@ COPY --from=busybox:1.37.0-musl /bin /busybox
 # Declare /busybox as a volume to get it automatically in the path to ignore
 VOLUME /busybox
 
+COPY --from=tools /output/curl /bin/curl
+COPY --from=tools /output/jq /bin/jq
+
 COPY --from=intermediate /cit /container-image-tools
 # Declare /container-image-tools as a volume to get it automatically in the path to ignore
 VOLUME /container-image-tools
 
 COPY --from=skopeo /go/github.com/containers/skopeo/default-policy.json /etc/containers/policy.json
 
-ENV PATH /busybox:/container-image-tools/bin
+ENV PATH /busybox:/container-image-tools/bin:/bin
 ENV DOCKER_CONFIG /container-image-tools/.docker/
 ENV SSL_CERT_DIR=/container-image-tools/ssl/certs
 ENV HOME /root
@@ -105,6 +173,9 @@ ENV USER root
 
 RUN ["/busybox/mkdir", "-p", "/bin"]
 RUN ["/busybox/ln", "-s", "/busybox/sh", "/bin/sh"]
+RUN ["/busybox/ln", "-s", "/busybox/sed", "/bin/sed"]
+RUN ["/busybox/mkdir", "-p", "/etc/ssl"]
+RUN ["/busybox/ln", "-s", "/container-image-tools/ssl/certs", "/etc/ssl/certs"]
 
 WORKDIR /workdir
 
