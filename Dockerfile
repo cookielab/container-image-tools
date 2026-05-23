@@ -152,7 +152,7 @@ RUN cp jq /output
 
 FROM scratch
 
-COPY --from=busybox:1.37.0-musl /bin /busybox
+COPY --from=busybox:1.38.0-musl /bin /busybox
 # Declare /busybox as a volume to get it automatically in the path to ignore
 VOLUME /busybox
 
